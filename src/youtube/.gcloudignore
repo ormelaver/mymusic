@@ -1,0 +1,13 @@
+.git
+.gitignore
+node_modules/
+
+# Don’t upload TS sources (optional)
+
+src/
+tsconfig.json
+\*.ts
+
+# Do upload compiled output
+
+!dist/

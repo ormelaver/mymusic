@@ -1,0 +1,45 @@
+{
+  "query": {
+    "aiUserPrompt": "give me only results posted in 2025",
+    "interval": 1,
+    "nofityBy": ["EMAIL", "SMS"],
+    "lastResult": "",
+    "name": "ai prompt test",
+    "nextRun": "2025-09-03T18:00:00.000Z",
+    "platform": "YOUTUBE",
+    "term": "outsiders ozora 2024",
+    "uid": "wkmDxwlJ8BTGqeePRFOOkuF38432"
+  },
+  "results": {
+    "kind": "youtube#searchResult",
+    "etag": "VnjucS4RH1qDM_s_6lDPFHwr8kM",
+    "id": { "kind": "youtube#video", "videoId": "L87LIeA5lks" },
+    "snippet": {
+      "publishedAt": "2025-08-03T07:00:16Z",
+      "channelId": "UChfawbJdUuHCTo1q-JG0OCg",
+      "title": "Acid Punks live @ Ozora Festival 2024 [Full set movie / 4K]",
+      "description": "Acid Punks is my project with Outsiders and here is the full movie from our set at Ozora Festival 2024 ! We had a blast showcasing ...",
+      "thumbnails": {
+        "default": {
+          "url": "https://i.ytimg.com/vi/L87LIeA5lks/default.jpg",
+          "width": 120,
+          "height": 90
+        },
+        "medium": {
+          "url": "https://i.ytimg.com/vi/L87LIeA5lks/mqdefault.jpg",
+          "width": 320,
+          "height": 180
+        },
+        "high": {
+          "url": "https://i.ytimg.com/vi/L87LIeA5lks/hqdefault.jpg",
+          "width": 480,
+          "height": 360
+        }
+      },
+      "channelTitle": "Ace Ventura",
+      "liveBroadcastContent": "none",
+      "publishTime": "2025-08-03T07:00:16Z"
+    }
+  },
+  "timestamp": "2025-09-06T15:18:33.984Z"
+}

@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  core-service:
+    build:
+      context: services/core-service
+      dockerfile: Dockerfile
+    ports:
+      - '8080:8080'
+    command: npm run start
+  youtube:
+    build:
+      context: services/youtube
+      dockerfile: Dockerfile
+    command: npm run start
