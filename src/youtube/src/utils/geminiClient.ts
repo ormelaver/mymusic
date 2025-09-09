@@ -22,7 +22,8 @@ export async function filterYoutubeResultsWithGemini(
                 .map(
                   (item, idx) => `${idx}. Title: "${item.snippet.title}"
   Description: "${item.snippet.description}"
-  Published At: "${item.snippet.publishedAt}"`
+  Published At: "${item.snippet.publishedAt}"
+  Channel Title: "${item.snippet.channelTitle}"`
                 )
                 .join('\n')}
             ${aiUserPrompt ? `User additional prompt: "${aiUserPrompt}"` : ''}
