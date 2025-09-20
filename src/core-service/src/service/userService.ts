@@ -1,6 +1,6 @@
 import * as admin from 'firebase-admin';
 import axios from 'axios';
-
+import { PubSub } from '@google-cloud/pubsub';
 import { UserData } from '../types/user';
 
 class UserService {
@@ -20,6 +20,13 @@ class UserService {
       }
 
       const addedUser = await admin.auth().createUser(createUserData);
+
+      // Publish event to PubSub 'new-user-added' topic
+      await this.publishMessage('new-user-added', {
+        uid: addedUser.uid,
+        createdAt: new Date().toISOString(),
+      });
+
       return addedUser;
     } catch (error) {
       throw error;
@@ -44,6 +51,16 @@ class UserService {
     } catch (error) {
       throw new Error('Login failed');
     }
+  }
+
+  private async publishMessage(
+    topicName: string,
+    payload: Record<string, any>
+  ) {
+    const pubsub = new PubSub();
+    const topic = pubsub.topic(topicName);
+    const dataBuffer = Buffer.from(JSON.stringify(payload));
+    await topic.publishMessage({ data: dataBuffer });
   }
 }
 

@@ -1,11 +1,11 @@
 {
-  "name": "core-service",
+  "name": "tei-manager",
   "version": "1.0.0",
   "description": "",
   "main": "dist/src/index.js",
   "scripts": {
-    "start": "ts-node-dev ./src/index.ts",
-    "deploy:cloudrun": "powershell.exe -File ./deploy-core.ps1"
+    "start": "ts-node-dev --project ./tsconfig.json --respawn --transpile-only ./src/index.ts",
+    "deploy:cloudrun": "powershell.exe -File ./deploy-tei-manager.ps1"
   },
   "keywords": [],
   "author": "",
@@ -13,12 +13,8 @@
   "dependencies": {
     "@google-cloud/datastore": "^9.1.0",
     "@google-cloud/pubsub": "^5.2.0",
-    "axios": "^1.7.7",
-    "date-fns": "^4.1.0",
     "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "express-validator": "^7.1.0",
-    "firebase-admin": "^12.4.0"
+    "express": "^4.19.2"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",

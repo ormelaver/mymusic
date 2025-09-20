@@ -1,3 +1,3 @@
 docker build -t europe-west1-docker.pkg.dev/mymusic-434611/mymusic-core-service/core:latest .
 docker push europe-west1-docker.pkg.dev/mymusic-434611/mymusic-core-service/core:latest
-gcloud run deploy core --image europe-west1-docker.pkg.dev/mymusic-434611/mymusic-core-service/core:latest --region europe-west1 --platform managed
+gcloud run deploy core --image europe-west1-docker.pkg.dev/mymusic-434611/mymusic-core-service/core:latest --region europe-west1 --platform managed --service-account 536004559604-compute@developer.gserviceaccount.com --update-secrets=FIREBASE_ADMIN_KEY=projects/536004559604/secrets/firebase-admin-key --set-env-vars=FIREBASE_API_KEY=AIzaSyAUxlLIhPDhXov4rgvPPr3vw1nRokiwfJQ

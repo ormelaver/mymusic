@@ -28,11 +28,19 @@ export interface SingleQuery {
   term: string;
   interval: QueryInterval;
   platform: Platform;
-  lastResult: string;
+  lastResult: FilteredResult;
   aiUserPrompt?: string;
   durationFrom?: number;
   durationTo?: number;
   nextRun?: string;
+}
+
+interface FilteredResult {
+  videoId: string;
+  title: string;
+  channelTitle: string;
+  description: string;
+  publishedAt?: string;
 }
 
 export interface DSEntity {
@@ -51,6 +59,7 @@ interface YoutubeSearchResult {
     publishedAt: string;
     channelId: string;
     title: string;
+    description: string;
     thumbnails: object[];
     channelTitle: string;
     liveBroadcastContent: string;
@@ -60,6 +69,11 @@ interface YoutubeSearchResult {
 
 export interface PubSubMessage {
   query: SingleQuery;
-  results: YoutubeSearchResult;
+  candidates: RankedResult[];
   timestamp: string;
+}
+
+interface RankedResult {
+  candidate: FilteredResult;
+  score: number;
 }

@@ -14,6 +14,10 @@ class PubSubController {
         return;
       }
 
+      const decodedData = Buffer.from(pubsubMessage.data, 'base64').toString(
+        'utf8'
+      );
+      console.log('Received Pub/Sub message:', JSON.stringify(decodedData));
       const result = await PubSubService.handlePubSubMessage(pubsubMessage);
 
       res.status(200).json({

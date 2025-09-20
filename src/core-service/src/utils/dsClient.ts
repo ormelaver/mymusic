@@ -22,27 +22,29 @@ class DatastoreClient {
 
   // CRUD operations
   public async saveEntities(kind: string, data: any): Promise<SingleQuery[]> {
-    const { uid, queries } = data;
-
-    const entities = queries.map((query: Record<string, any>) => {
-      const queryKey = this.datastore.key(['Query', `${uid}-${query.name}`]);
-
-      return {
-        key: queryKey,
-        data: {
-          ...query,
-          uid,
-        },
-      };
-    });
-    console.log('Saving entities to Datastore:', entities);
     try {
+      const { uid, queries } = data;
+
+      const entities = queries.map((query: Record<string, any>) => {
+        const queryKey = this.datastore.key(['Query', `${uid}-${query.name}`]);
+
+        return {
+          key: queryKey,
+          data: {
+            ...query,
+            uid,
+          },
+        };
+      });
+      console.log('Saving entities to Datastore:', entities);
+
       await this.datastore.save(entities);
       console.log(
         `${data.queries.length} entity(ies) of kind ${kind} saved successfully.`
       );
       return data.queries;
     } catch (error: any) {
+      console.error('Error saving entities:', error.message);
       throw error;
     }
   }

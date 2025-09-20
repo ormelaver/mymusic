@@ -4,7 +4,7 @@ import { PubSub } from '@google-cloud/pubsub';
 
 import DatastoreClient from '../utils/dsClient';
 import { getRelevantQueries } from '../utils/filter';
-import { Platform, SingleQuery } from '../types/query';
+import { FilteredResult, Platform, SingleQuery } from '../types/query';
 import { MessageOptions } from '@google-cloud/pubsub/build/src/topic';
 import { filterYoutubeResultsWithGemini } from '../utils/geminiClient';
 
@@ -37,12 +37,19 @@ class YoutubeClient {
 
     for (const query of relevantQueries) {
       const aiUserPrompt = query.aiUserPrompt ?? '';
-      const result = await this.searchYouTube(query.term, aiUserPrompt);
+      const candidates = await this.searchYouTube(query.term, aiUserPrompt);
 
-      if (result && result.id && result.id.videoId !== query.lastResult) {
-        console.log('New result found, publishing to Pub/Sub...', result);
+      if (candidates && candidates.length > 0) {
+        console.log(
+          'Publishing search results to Pub/Sub [new-results]...',
+          candidates
+        );
         //publish new-results event to PubSub
-        await this.publishSearchResults(result, 'new-results', query);
+        await this.publishSearchResults('new-results', {
+          uid: query.uid,
+          query,
+          candidates,
+        });
       }
     }
   }
@@ -53,8 +60,8 @@ class YoutubeClient {
     maxResults: number = 5
   ) {
     if (!this.youtube) {
-      console.error('YouTube client is not initialized yet');
-      return;
+      console.error('YouTube client is not initialized yet. retrying...');
+      await this.initializeYouTubeClient();
     }
     try {
       const searchResults = await this.youtube.search.list({
@@ -66,20 +73,15 @@ class YoutubeClient {
       });
 
       const items = searchResults.data.items || [];
-      const relevantIndexes = await filterYoutubeResultsWithGemini(
-        query,
-        aiUserPrompt,
-        items
-      );
 
-      const filteredResults = relevantIndexes
-        .map((idx: number) => items[idx])
-        .filter(Boolean);
+      // Extract only the required properties from each item
+      const simplified = items.map(this.extractBasicInfo);
 
-      const sortedResults = this.sortResultsByPublishedAt(filteredResults);
-      return sortedResults[0];
-    } catch (error) {
-      console.error('Error searching YouTube:', error);
+      console.log('Filtered YouTube results:', JSON.stringify(simplified));
+      return simplified;
+    } catch (error: any) {
+      console.error('Error searching YouTube:', error.message);
+      throw error;
     }
   }
 
@@ -100,19 +102,33 @@ class YoutubeClient {
       value: Platform.YOUTUBE,
     });
 
+    console.log('Fetched queries from Datastore:', queries);
     return queries;
   }
 
+  private extractBasicInfo(item: youtube_v3.Schema$SearchResult) {
+    return {
+      videoId:
+        item.id && typeof item.id === 'object' ? item.id.videoId : undefined,
+      title: item.snippet?.title,
+      channelTitle: item.snippet?.channelTitle,
+      description: item.snippet?.description,
+      publishedAt: item.snippet?.publishedAt,
+    };
+  }
+
   private async publishSearchResults(
-    results: any,
     topicName: string,
-    query: SingleQuery
+    publishData: {
+      uid: string;
+      query: SingleQuery;
+      candidates: FilteredResult[];
+    }
   ) {
     try {
       const topic = this.pubsub.topic(topicName);
       const data = {
-        query,
-        results,
+        ...publishData,
         timestamp: new Date().toISOString(),
       };
 

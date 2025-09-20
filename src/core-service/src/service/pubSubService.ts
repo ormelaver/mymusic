@@ -1,28 +1,37 @@
 import DatastoreClient from '../utils/dsClient';
 import { addDays } from 'date-fns';
-import { PubSubMessage } from '../types/query';
+import { PubSubMessage, SingleQuery } from '../types/query';
 
 class PubSubService {
   async handlePubSubMessage(pubsubMessage: { data: string }): Promise<any> {
-    const decodedData = Buffer.from(pubsubMessage.data, 'base64').toString(
-      'utf8'
-    );
-
     try {
+      const decodedData = Buffer.from(pubsubMessage.data, 'base64').toString(
+        'utf8'
+      );
       const messageData = JSON.parse(decodedData);
+      console.log('Parsed Pub/Sub message data:', JSON.stringify(messageData));
       if (!this.isValidPubSubMessage(messageData)) {
         throw new Error('Invalid message format');
       }
 
-      const { query, results, timestamp }: PubSubMessage = messageData;
+      const { query, candidates, timestamp }: PubSubMessage = messageData;
       const nextRunDate = addDays(new Date(timestamp), query.interval);
 
-      const updatedQuery = {
+      const updatedQuery: SingleQuery = {
         ...query,
-        lastResult: results.id!.videoId,
         nextRun: nextRunDate.toISOString(),
       };
 
+      console.log('Updated query:', updatedQuery);
+      if (query.lastResult.videoId !== candidates[0].candidate.videoId) {
+        updatedQuery.lastResult = {
+          videoId: candidates[0].candidate.videoId,
+          title: candidates[0].candidate.title,
+          channelTitle: candidates[0].candidate.channelTitle,
+          description: candidates[0].candidate.description,
+          publishedAt: candidates[0].candidate.publishedAt ?? '',
+        };
+      }
       const dsClient = DatastoreClient.getInstance();
       await dsClient.saveEntities('Query', {
         uid: query.uid,
@@ -31,6 +40,7 @@ class PubSubService {
 
       return updatedQuery;
     } catch (error: any) {
+      console.error('Error handling Pub/Sub message:', error.message);
       throw new Error(error);
     }
   }
@@ -45,10 +55,10 @@ class PubSubService {
       !messageData.query.platform ||
       !messageData.query.term ||
       !messageData.query.uid ||
-      !messageData.results ||
-      !messageData.results.id ||
-      !messageData.results.id.videoId ||
-      typeof messageData.results.id.videoId !== 'string' ||
+      !messageData.candidates ||
+      // !messageData.candidates[0].id ||
+      // !messageData.candidates[0].id.videoId ||
+      // typeof messageData.candidates[0].id.videoId !== 'string' ||
       !messageData.timestamp
     ) {
       return false;

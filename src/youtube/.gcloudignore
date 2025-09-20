@@ -1,6 +1,7 @@
 .git
 .gitignore
 node_modules/
+.env
 
 # Don’t upload TS sources (optional)
 

@@ -19,3 +19,11 @@ export interface SingleQuery {
   durationTo?: number;
   nextRun?: string;
 }
+
+export interface FilteredResult {
+  videoId: string;
+  title: string;
+  channelTitle: string;
+  description: string;
+  publishedAt?: string;
+}

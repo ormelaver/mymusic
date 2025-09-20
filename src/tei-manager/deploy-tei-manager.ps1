@@ -1,0 +1,3 @@
+docker build -t europe-west1-docker.pkg.dev/mymusic-434611/mymusic-core-service/tei-mng:latest .
+docker push europe-west1-docker.pkg.dev/mymusic-434611/mymusic-core-service/tei-mng:latest
+gcloud run deploy tei-mng --image europe-west1-docker.pkg.dev/mymusic-434611/mymusic-core-service/tei-mng:latest --region europe-west1 --platform managed --service-account 536004559604-compute@developer.gserviceaccount.com
